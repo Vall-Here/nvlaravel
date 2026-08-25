@@ -219,17 +219,36 @@ You can install and use nvlaravel via three different methods:
 
 ### Method 1: Standalone Executable (Recommended)
 
-Download the pre-compiled standalone binary to avoid any global Composer conflicts.
+Download the pre-compiled standalone binary to avoid any global Composer conflicts. This is a single, self-contained file that runs anywhere.
 
-1. Download the `nvlaravel` file from the latest [GitHub Releases](https://github.com/vall-here/nvlaravel/releases).
-2. Move it to a directory in your system `PATH` (e.g., `/usr/local/bin` on Linux/macOS) and make it executable.
-3. Run it from anywhere:
+**For macOS / Linux:**
 
-```bash
-nvlaravel new my-app
-```
+1. Download the executable directly from the terminal:
+   ```bash
+   curl -sL https://github.com/vall-here/nvlaravel/releases/latest/download/nvlaravel -o nvlaravel
+   ```
+2. Make it executable:
+   ```bash
+   chmod +x nvlaravel
+   ```
+3. Move it to your system PATH to use it globally:
+   ```bash
+   sudo mv nvlaravel /usr/local/bin/
+   ```
+4. Run the wizard from anywhere:
+   ```bash
+   nvlaravel new my-app
+   ```
 
-*Alternatively, you can just run `php nvlaravel new my-app` directly without moving it to your PATH.*
+**For Windows:**
+
+1. Download the `nvlaravel` file from the [latest GitHub Releases](https://github.com/vall-here/nvlaravel/releases).
+2. Move the file to a directory that is registered in your system's Environment Variables (for example, the folder where PHP is installed, or any custom `PATH` folder).
+3. Open your Terminal or Command Prompt and run it via PHP:
+   ```cmd
+   php nvlaravel new my-app
+   ```
+   *(tip: You can create an `nvlaravel.bat` file in the same folder with the content `@php "%~dp0nvlaravel" %*` so you can run it simply by typing `nvlaravel` without the `php` prefix).*
 
 ### Method 2: Global Composer
 
