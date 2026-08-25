@@ -1,6 +1,15 @@
-# nvlaravel
+```
+          _                           _
+  _ ____   _| | __ _ _ __ __ ___   _____| |
+ | '_ \ \ / / |/ _` | '__/ _` \ \ / / _ \ |
+ | | | \ V /| | (_| | | | (_| |\ V /  __/ |
+ |_| |_|\_/ |_|\__,_|_|  \__,_| \_/ \___|_|
+
+      Composable Laravel Generator
+```
 
 Composable project scaffolding CLI for Laravel applications. Enables multi-layered stack combinations with automatic dependency resolution and atomic rollback.
+
 
 ## Supported Configuration Layers
 
