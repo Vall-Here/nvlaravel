@@ -329,6 +329,22 @@ Compile standalone Phar executable:
 php -d phar.readonly=0 build_phar.php
 ```
 
+## Contributing
+
+We welcome contributions from the community! Whether it's a bug fix, a new feature, or an improvement to the documentation, your help is appreciated.
+
+### Reporting Issues
+If you find a bug or have a feature request, please open an issue on the [GitHub Issues](https://github.com/vall-here/nvlaravel/issues) page. Include as much detail as possible to help us understand the problem.
+
+### Submitting Pull Requests
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix (`git checkout -b feature/your-feature-name`).
+3. Make your changes and commit them with clear, descriptive messages (`git commit -m "Add some feature"`).
+4. Push your branch to your fork (`git push origin feature/your-feature-name`).
+5. Open a Pull Request against the `main` branch of this repository.
+
+Ensure your code follows the existing style and passes all tests by running `./vendor/bin/pest`.
+
 ## License
 
 MIT License.
