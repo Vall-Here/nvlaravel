@@ -210,6 +210,17 @@ ASCII);
                     default: ['modular-architecture']
                 );
                 $runtime->enableMany($packages);
+
+                $infrastructure = multiselect(
+                    label: 'Development & Workflow Tools (Select all that apply)',
+                    options: [
+                        'database-migrate' => 'Auto-create SQLite database & run migrations',
+                        'git' => 'Initialize local Git repository & initial commit',
+                        'ci-cd' => 'Generate GitHub Actions CI/CD Pipeline (Pest, PHPStan, Pint)',
+                    ],
+                    default: ['database-migrate', 'git', 'ci-cd']
+                );
+                $runtime->enableMany($infrastructure);
             }
         }
 

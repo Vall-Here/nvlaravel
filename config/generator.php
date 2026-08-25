@@ -179,12 +179,33 @@ return [
             'requires' => ['laravel'],
             'conflicts' => [],
         ],
+        'git' => [
+            'name' => 'Initialize Git Repository',
+            'type' => 'infrastructure',
+            'handler' => \App\Handlers\Infrastructure\InstallGit::class,
+            'requires' => ['laravel'],
+            'conflicts' => [],
+        ],
+        'ci-cd' => [
+            'name' => 'GitHub Actions CI/CD Pipeline',
+            'type' => 'infrastructure',
+            'handler' => \App\Handlers\Infrastructure\InstallCiCd::class,
+            'requires' => ['laravel'],
+            'conflicts' => [],
+        ],
+        'database-migrate' => [
+            'name' => 'Run Database Migrations',
+            'type' => 'infrastructure',
+            'handler' => \App\Handlers\Infrastructure\InstallDatabase::class,
+            'requires' => ['laravel'],
+            'conflicts' => [],
+        ],
     ],
 
     'presets' => [
         'classic' => [
             'name' => 'Modern Classic (Blade + Livewire + Alpine + Tailwind + Vite)',
-            'technologies' => ['blade', 'livewire', 'alpine', 'tailwind', 'vite'],
+            'technologies' => ['blade', 'livewire', 'alpine', 'tailwind', 'vite', 'git', 'ci-cd'],
         ],
         'inertia-react' => [
             'name' => 'Inertia React (Inertia + React + Tailwind + Vite)',

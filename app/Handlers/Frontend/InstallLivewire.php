@@ -11,6 +11,7 @@ final class InstallLivewire
     public function handle(StarterContext $context): void
     {
         $context->composer()->require(['livewire/livewire']);
-        $context->log("Laravel Livewire installed.");
+        $context->composer()->artisan(['livewire:layout']);
+        $context->log("Laravel Livewire installed and base layout generated.");
     }
 }

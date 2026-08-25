@@ -40,7 +40,13 @@ final class Resolver
 
         $this->validateConflicts($resolved);
 
-        return $resolved;
+        // Ensure database-migrate is always the very last step if enabled
+        if (($key = array_search('database-migrate', $resolved, true)) !== false) {
+            unset($resolved[$key]);
+            $resolved[] = 'database-migrate';
+        }
+
+        return array_values($resolved);
     }
 
     private function resolveItem(string $id, array &$resolved, array &$visited, array $path): void

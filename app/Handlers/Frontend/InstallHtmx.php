@@ -12,13 +12,18 @@ final class InstallHtmx
     {
         $context->npm()->install(['htmx.org']);
 
-        $context->files()->modify('resources/js/app.js', function (string $content) {
+        $jsFile = 'resources/js/app.js';
+        if ($context->files()->exists('resources/js/app.jsx')) {
+            $jsFile = 'resources/js/app.jsx';
+        }
+
+        $context->files()->modify($jsFile, function (string $content) {
             if (!str_contains($content, 'htmx')) {
                 return "import 'htmx.org';\n" . $content;
             }
             return $content;
         });
 
-        $context->log("HTMX installed and imported in resources/js/app.js.");
+        $context->log("HTMX installed and imported in {$jsFile}.");
     }
 }

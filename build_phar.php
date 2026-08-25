@@ -40,5 +40,5 @@ $phar->stopBuffering();
 
 rename($tempPhar, $finalBinary);
 
-echo "✨ SUCCESSFULLY BUILT: " . realpath($finalBinary) . "\n";
-echo "📦 Size: " . round(filesize($finalBinary) / (1024 * 1024), 2) . " MB\n";
+echo " SUCCESSFULLY BUILT: " . realpath($finalBinary) . "\n";
+echo " Size: " . round(filesize($finalBinary) / (1024 * 1024), 2) . " MB\n";

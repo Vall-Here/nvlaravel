@@ -62,6 +62,23 @@ final class FileModifier
         File::copyDirectory($sourcePath, $fullTarget);
     }
 
+    public function move(string $oldRelativePath, string $newRelativePath): void
+    {
+        $oldFull = $this->fullPath($oldRelativePath);
+        $newFull = $this->fullPath($newRelativePath);
+        if (File::exists($oldFull)) {
+            File::move($oldFull, $newFull);
+        }
+    }
+
+    public function delete(string $relativePath): void
+    {
+        $fullPath = $this->fullPath($relativePath);
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
+    }
+
     public function exists(string $relativePath): bool
     {
         return File::exists($this->fullPath($relativePath));
