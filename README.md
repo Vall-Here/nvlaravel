@@ -218,7 +218,7 @@ nvlaravel scaffolds projects based on composable options across the following do
 Install globally via Composer:
 
 ```bash
-composer global require Vall-Here/nvlaravel
+composer global require vall-here/nvlaravel
 ```
 
 Ensure your global Composer bin directory is in your system `PATH`.

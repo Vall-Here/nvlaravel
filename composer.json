@@ -1,5 +1,5 @@
 {
-    "name": "Vall-Here/nvlaravel",
+    "name": "vall-here/nvlaravel",
     "description": "Composable, enterprise-grade project scaffolding CLI for Laravel applications.",
     "keywords": ["laravel", "scaffold", "generator", "cli", "blade", "livewire", "inertia", "react", "vue", "htmx", "tailwind"],
     "homepage": "https://github.com/Vall-Here/nvlaravel",
