@@ -287,6 +287,59 @@ Create a new Laravel project using the interactive wizard:
 nvlaravel new my-app
 ```
 
+### Interactive Demo & Workflow
+
+When you run the command above, `nvlaravel` will guide you through a beautiful, interactive CLI prompt. You can mix and match any stack you want!
+
+**Example Interaction:**
+```text
+  _                           _
+ _ ____   _| | __ _ _ __ __ ___   _____| |
+| '_ \ \ / / |/ _` | '__/ _` \ \ / / _ \ |
+| | | \ V /| | (_| | | | (_| |\ V /  __/ |
+|_| |_|\_/ |_|\__,_|_|  \__,_| \_/ \___|_|
+
+✨ Welcome to nvlaravel - The Composable Laravel Generator!
+
+? Select a preset (or choose 'Custom' to build your own):
+  › Custom (Interactive Wizard)
+    Classic (Blade + Livewire + Alpine + Tailwind + Vite)
+    Inertia React (React + Tailwind + Vite)
+    Inertia Vue (Vue + Tailwind + Vite)
+
+? Select Laravel Framework Version:
+  › Laravel Latest (v13+)
+
+? Server Rendering Engine:
+  › Inertia.js Monolith Adapter
+
+? JavaScript Component Libraries:
+  ◼ React
+  ◻ Vue.js
+
+? Backend & Infrastructure Packages:
+  ◼ Laravel Breeze (Auth UI Scaffolding)
+  ◼ Spatie Permission (Roles & Permissions)
+
+? Development & Workflow Tools:
+  ◼ Auto-create SQLite database & run migrations
+  ◼ Generate GitHub Actions CI/CD Pipeline
+```
+
+**What Happens Next?**
+Behind the scenes, the generator's **Execution Engine** kicks in:
+1. **Dependency Resolution**: It calculates that React requires Vite, and Breeze conflicts with Fortify.
+2. **Context-Aware Scaffolding**: It detects that you chose `Breeze`, so it intelligently *skips* overwriting `app.jsx` to preserve Breeze's Authentication boilerplate, while still injecting `HasRoles` into your `User` model for Spatie Permission.
+3. **Execution**:
+```text
+  ✓ Base Laravel Framework (latest) initialized at /var/www/my-app
+  ✓ Laravel Breeze installed with [react] stack.
+  ✓ Spatie Permission installed, config published, and HasRoles trait added to User model.
+  ✓ Database initialized (SQLite) and migrations executed successfully.
+  ✓ GitHub Actions CI/CD Pipeline workflow generated.
+```
+**End Result**: You get a fully functional, production-ready Laravel monolith. You can just `cd my-app && php artisan serve` and everything (Auth, DB, Permissions, CI/CD) works immediately out-of-the-box!
+
 ### Using Presets
 
 ```bash
