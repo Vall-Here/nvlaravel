@@ -242,13 +242,23 @@ Download the pre-compiled standalone binary to avoid any global Composer conflic
 
 **For Windows:**
 
-1. Download the `nvlaravel` file from the [latest GitHub Releases](https://github.com/vall-here/nvlaravel/releases).
-2. Move the file to a directory that is registered in your system's Environment Variables (for example, the folder where PHP is installed, or any custom `PATH` folder).
-3. Open your Terminal or Command Prompt and run it via PHP:
-   ```cmd
-   php nvlaravel new my-app
+1. **Download the File**: Download the `nvlaravel` executable from the [latest GitHub Releases](https://github.com/vall-here/nvlaravel/releases).
+2. **Create a Dedicated Folder**: Create a new folder on your computer where you will store command-line tools. For example: `C:\tools\nvlaravel\`
+3. **Move the File**: Move the downloaded `nvlaravel` file into this new folder (`C:\tools\nvlaravel\nvlaravel`).
+4. **Create a Batch Wrapper**: To run it like a native Windows command, create a new text file in the same folder, name it `nvlaravel.bat`, and add this exact content:
+   ```bat
+   @php "%~dp0nvlaravel" %*
    ```
-   *(tip: You can create an `nvlaravel.bat` file in the same folder with the content `@php "%~dp0nvlaravel" %*` so you can run it simply by typing `nvlaravel` without the `php` prefix).*
+5. **Add to System PATH**:
+   - Press the Windows Key, type **Environment Variables**, and select **Edit the system environment variables**.
+   - Click the **Environment Variables** button at the bottom.
+   - Under **System variables** (or User variables), find the `Path` variable, select it, and click **Edit**.
+   - Click **New** and paste the path to your folder: `C:\tools\nvlaravel\`
+   - Click **OK** on all windows to save.
+6. **Restart Terminal**: Close and reopen your Command Prompt or PowerShell, then test the command from anywhere:
+   ```cmd
+   nvlaravel new my-app
+   ```
 
 ### Method 2: Global Composer
 
