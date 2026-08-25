@@ -215,13 +215,40 @@ nvlaravel scaffolds projects based on composable options across the following do
 
 ## Installation
 
-Install globally via Composer:
+You can install and use nvlaravel via three different methods:
+
+### Method 1: Standalone Executable (Recommended)
+
+Download the pre-compiled standalone binary to avoid any global Composer conflicts.
+
+1. Download the `nvlaravel` file from the latest [GitHub Releases](https://github.com/vall-here/nvlaravel/releases).
+2. Move it to a directory in your system `PATH` (e.g., `/usr/local/bin` on Linux/macOS) and make it executable.
+3. Run it from anywhere:
+
+```bash
+nvlaravel new my-app
+```
+
+*Alternatively, you can just run `php nvlaravel new my-app` directly without moving it to your PATH.*
+
+### Method 2: Global Composer
+
+If your global Composer environment is clean, you can install it globally:
 
 ```bash
 composer global require vall-here/nvlaravel
 ```
+*(Ensure your global Composer bin directory is in your system `PATH`.)*
 
-Ensure your global Composer bin directory is in your system `PATH`.
+### Method 3: Isolated Composer Project
+
+If you prefer to keep the generator isolated but still use Composer:
+
+```bash
+composer create-project vall-here/nvlaravel my-generator
+cd my-generator
+php nvlaravel new my-app
+```
 
 ## Usage
 
