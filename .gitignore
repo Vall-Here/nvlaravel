@@ -1,0 +1,10 @@
+/vendor
+/.idea
+/.vscode
+/.vagrant
+.phpunit.result.cache
+/builds/*
+!/builds/.gitkeep
+/tmp
+/.box_dump
+.env

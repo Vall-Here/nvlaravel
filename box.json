@@ -1,0 +1,1 @@
+{"chmod":"0755","directories":["app","bootstrap","config","vendor"],"files":["composer.json"],"compactors":["KevinGH\\Box\\Compactor\\Php","KevinGH\\Box\\Compactor\\Json"],"dump-autoload":false,"main":"nvlaravel"}
