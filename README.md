@@ -408,6 +408,12 @@ If you find a bug or have a feature request, please open an issue on the [GitHub
 
 Ensure your code follows the existing style and passes all tests by running `./vendor/bin/pest`.
 
+### ☕ Support
+
+If you find this project useful, consider supporting my work:
+
+[![Saweria](https://img.shields.io/badge/☕%20Traktir%20Saya-Saweria-orange?style=for-the-badge)](https://saweria.co/valldev)
+
 ## License
 
 MIT License.
