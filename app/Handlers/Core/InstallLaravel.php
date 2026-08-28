@@ -20,7 +20,6 @@ final class InstallLaravel
         };
 
         $context->composer()->createProject($package, $targetPath);
-        $context->files()->put('database/database.sqlite', '');
         $context->log("Base Laravel Framework ({$version}) initialized at {$targetPath}");
     }
 }
