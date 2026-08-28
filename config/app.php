@@ -1,6 +1,6 @@
 <?php return array (
   'name' => 'Nvlaravel',
-  'version' => '1.0.0',
+  'version' => '1.1.1',
   'env' => 'development',
   'providers' => 
   array (
