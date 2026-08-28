@@ -35,6 +35,11 @@ final class InstallVite
             $plugins[] = "vue({\n            template: {\n                transformAssetUrls: {\n                    base: null,\n                    includeAbsolute: false,\n                },\n            },\n        })";
         }
 
+        if ($context->runtime()->isEnabled('inertia')) {
+            $imports[] = "import inertia from '@inertiajs/vite';";
+            $plugins[] = "inertia()";
+        }
+
         if ($context->runtime()->isEnabled('tailwind') && $context->runtime()->getOption('tailwind', 'version') === 'v4') {
             $imports[] = "import tailwindcss from '@tailwindcss/vite';";
             array_unshift($plugins, "tailwindcss()");

@@ -45,7 +45,7 @@ final class InstallTailwind
 
             $context->files()->modify('resources/css/app.css', function (string $content) {
                 if (!str_contains($content, '@import "tailwindcss";')) {
-                    return "@import \"tailwindcss\";\n" . $content;
+                    return "@import \"tailwindcss\";\n@source \"../views\";\n" . $content;
                 }
                 return $content;
             });

@@ -16,6 +16,7 @@ final class InstallInertia
         }
 
         $context->composer()->require(['inertiajs/inertia-laravel']);
+        $context->npm()->install(['@inertiajs/vite']);
         $context->composer()->artisan(['inertia:middleware']);
 
         // Register middleware in bootstrap/app.php

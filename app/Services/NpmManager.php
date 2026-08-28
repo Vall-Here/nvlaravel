@@ -19,7 +19,7 @@ final class NpmManager
     public function install(array $packages = [], bool $dev = true): void
     {
         if (empty($packages)) {
-            $this->run(['npm', 'install']);
+            $this->run(['npm', 'install', '--legacy-peer-deps']);
             return;
         }
 
@@ -27,6 +27,8 @@ final class NpmManager
         if ($dev) {
             $cmd[] = '-D';
         }
+        $cmd[] = '--legacy-peer-deps';
+        
         $this->run($cmd);
     }
 
