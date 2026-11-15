@@ -22,6 +22,7 @@ final class InstallBreeze
         }
 
         $context->composer()->artisan(['breeze:install', $stack, '--no-interaction']);
+        $context->npm()->install();
         $context->log("Laravel Breeze installed with [{$stack}] stack.");
     }
 }

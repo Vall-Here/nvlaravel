@@ -20,8 +20,15 @@ final class Executor
     public function execute(ExecutionPlan $plan): void
     {
         $handlers = $plan->handlers();
+        $optimizer = new \App\Services\PostInstallOptimizer();
+        $optimized = false;
 
         foreach ($handlers as $techId => $handlerClass) {
+            if ($techId === 'git' && !$optimized) {
+                $optimizer->optimize($this->context);
+                $optimized = true;
+            }
+
             if (!class_exists($handlerClass)) {
                 $this->context->warn("Handler class [{$handlerClass}] for technology [{$techId}] does not exist. Skipping.");
                 continue;
@@ -37,6 +44,10 @@ final class Executor
             }
 
             $handler->handle($this->context);
+        }
+
+        if (!$optimized) {
+            $optimizer->optimize($this->context);
         }
     }
 }

@@ -26,11 +26,6 @@ final class Blueprint
         return new self($data ?? []);
     }
 
-    public function get(string $key, mixed $default = null): mixed
-    {
-        return Arr::get($this->registry, $key, $default);
-    }
-
     public function technology(string $id): array
     {
         return Arr::get($this->registry, "technologies.{$id}", []);
@@ -69,13 +64,5 @@ final class Blueprint
     public function allPresets(): array
     {
         return $this->registry['presets'] ?? [];
-    }
-
-    public function technologyGroup(string $type): array
-    {
-        return array_filter(
-            $this->allTechnologies(),
-            fn (array $tech) => ($tech['type'] ?? null) === $type
-        );
     }
 }

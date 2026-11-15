@@ -10,7 +10,22 @@ final class InstallShadcn
 {
     public function handle(StarterContext $context): void
     {
-        $context->npm()->install(['clsx', 'tailwind-merge', 'lucide-react', 'class-variance-authority']);
-        $context->log("Shadcn UI prerequisites installed.");
+        $packages = ['clsx', 'tailwind-merge', 'class-variance-authority'];
+        if ($context->runtime()->isEnabled('react')) {
+            $packages[] = 'lucide-react';
+        }
+
+        $context->npm()->install($packages);
+
+        $context->files()->put('resources/js/lib/utils.js', <<<JS
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs) {
+    return twMerge(clsx(inputs));
+}
+JS);
+
+        $context->log("Shadcn UI prerequisites installed and resources/js/lib/utils.js created.");
     }
 }

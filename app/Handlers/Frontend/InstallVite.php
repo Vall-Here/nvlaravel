@@ -15,8 +15,6 @@ final class InstallVite
             return;
         }
 
-        $context->npm()->install();
-
         $inputJs = 'resources/js/app.js';
         if ($context->runtime()->isEnabled('react')) {
             $inputJs = 'resources/js/app.jsx';
@@ -40,7 +38,7 @@ final class InstallVite
             $plugins[] = "inertia()";
         }
 
-        if ($context->runtime()->isEnabled('tailwind') && $context->runtime()->getOption('tailwind', 'version') === 'v4') {
+        if ($context->runtime()->isEnabled('tailwind') && $context->runtime()->getOption('tailwind', 'version', 'v4') === 'v4') {
             $imports[] = "import tailwindcss from '@tailwindcss/vite';";
             array_unshift($plugins, "tailwindcss()");
         }
@@ -55,6 +53,11 @@ export default defineConfig({
     plugins: [
         {$pluginsStr},
     ],
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    },
 });
 JS;
 
@@ -62,7 +65,7 @@ JS;
         $context->log("Vite configured dynamically with plugins for: " . implode(', ', array_filter([
             $context->runtime()->isEnabled('react') ? 'React' : null,
             $context->runtime()->isEnabled('vue') ? 'Vue' : null,
-            ($context->runtime()->isEnabled('tailwind') && $context->runtime()->getOption('tailwind', 'version') === 'v4') ? 'Tailwind v4' : null,
+            ($context->runtime()->isEnabled('tailwind') && $context->runtime()->getOption('tailwind', 'version', 'v4') === 'v4') ? 'Tailwind v4' : null,
         ])));
     }
 }

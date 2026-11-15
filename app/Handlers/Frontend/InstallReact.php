@@ -23,7 +23,6 @@ final class InstallReact
             $context->npm()->install(['@inertiajs/react']);
             $stub = <<<JS
 import './bootstrap';
-import '../css/app.css';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -75,6 +74,22 @@ if (root) {
 }
 JS;
             $context->files()->put('resources/js/app.jsx', $stub);
+
+            // Update welcome.blade.php for standalone React + Blade
+            $context->files()->modify('resources/views/welcome.blade.php', function (string $content) {
+                $content = str_replace("'resources/js/app.js'", "'resources/js/app.jsx'", $content);
+                $content = str_replace('"resources/js/app.js"', '"resources/js/app.jsx"', $content);
+
+                if (!str_contains($content, '@viteReactRefresh')) {
+                    $content = preg_replace('/(@vite\()/', "@viteReactRefresh\n        $1", $content);
+                }
+
+                if (!str_contains($content, 'id="app"')) {
+                    $content = preg_replace('/(<body[^>]*>)/', "$1\n        <div id=\"app\"></div>", $content);
+                }
+
+                return $content;
+            });
         }
 
         $context->log("React and Vite React plugin installed.");

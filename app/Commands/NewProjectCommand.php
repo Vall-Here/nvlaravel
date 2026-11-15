@@ -26,6 +26,7 @@ use function Laravel\Prompts\warning;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\spin;
 use function Laravel\Prompts\table;
+use function Laravel\Prompts\form;
 
 final class NewProjectCommand extends Command
 {
@@ -47,12 +48,28 @@ ASCII);
 
         // Step 1: Environment Health Check
         $doctor = new EnvironmentDoctor();
-        $issues = $doctor->checkPrerequisites();
-        if (!empty($issues)) {
-            error('Environment Health Check Failed:');
-            foreach ($issues as $issue) {
-                warning($issue);
+        $checks = $doctor->performChecks();
+        
+        $tableRows = [];
+        $hasFatal = false;
+        foreach ($checks as $check) {
+            $tableRows[] = [
+                $check['Component'],
+                $check['Status'],
+                $check['Details']
+            ];
+            if (!$check['Passed'] && $check['Critical']) {
+                $hasFatal = true;
             }
+        }
+
+        table(
+            headers: ['System Component', 'Status', 'Details'],
+            rows: $tableRows
+        );
+
+        if ($hasFatal) {
+            error('System requirements not met. Please resolve the FAILED checks above before continuing.');
             return 1;
         }
 
@@ -93,134 +110,148 @@ ASCII);
                 error("Preset [{$presetArg}] not found.");
                 return 1;
             }
+            $runtime->setOption('laravel', 'version', $this->option('laravel-version') ?? 'latest');
+            $runtime->setOption('tailwind', 'version', $this->option('tailwind-version') ?? 'v4');
             $runtime->enableMany($preset['technologies']);
         } else {
-            $mode = select(
-                label: 'How would you like to configure your project?',
-                options: [
-                    'preset' => 'Choose from Pre-configured Presets',
-                    'custom' => 'Custom Composable Builder (Select layer by layer)',
-                ],
-                default: 'preset'
-            );
+            $responses = form()
+                ->select(
+                    label: 'How would you like to configure your project?',
+                    options: [
+                        'preset' => 'Choose from Pre-configured Presets',
+                        'custom' => 'Custom Composable Builder (Select layer by layer)',
+                    ],
+                    default: 'preset',
+                    name: 'mode'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'preset',
+                    function () use ($blueprint) {
+                        $presetOptions = [];
+                        foreach ($blueprint->allPresets() as $key => $presetData) {
+                            $presetOptions[$key] = $presetData['name'];
+                        }
+                        return \Laravel\Prompts\select(label: 'Select a Preset', options: $presetOptions);
+                    },
+                    name: 'preset_key'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\select(
+                        label: 'Select Laravel Framework Version',
+                        options: ['latest' => 'Laravel Latest (v13+)', '12' => 'Laravel 12', '11' => 'Laravel 11'],
+                        default: 'latest'
+                    ),
+                    name: 'laravel_version'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\select(
+                        label: 'Server Rendering Engine',
+                        options: ['blade' => 'Blade Templating Engine', 'inertia' => 'Inertia.js Monolith Adapter'],
+                        default: 'blade'
+                    ),
+                    name: 'rendering'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\multiselect(
+                        label: 'Reactivity Layers (Select all that apply)',
+                        options: ['livewire' => 'Laravel Livewire (Server Reactivity)', 'alpine' => 'Alpine.js (Client State & Interactivity)', 'htmx' => 'HTMX (HTML-driven AJAX)'],
+                        default: ['livewire', 'alpine']
+                    ),
+                    name: 'reactivity'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\multiselect(
+                        label: 'JavaScript Component Libraries (Optional)',
+                        options: ['react' => 'React', 'vue' => 'Vue.js'],
+                        default: []
+                    ),
+                    name: 'js_frameworks'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\select(
+                        label: 'CSS Framework',
+                        options: ['tailwind' => 'Tailwind CSS', 'bootstrap' => 'Bootstrap CSS'],
+                        default: 'tailwind'
+                    ),
+                    name: 'css_framework'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom' && isset($responses['css_framework']) && $responses['css_framework'] === 'tailwind',
+                    fn () => \Laravel\Prompts\select(
+                        label: 'Select Tailwind CSS Version',
+                        options: ['v4' => 'Tailwind CSS v4 (@tailwindcss/vite)', 'v3' => 'Tailwind CSS v3 (PostCSS + tailwind.config.js)'],
+                        default: 'v4'
+                    ),
+                    name: 'tailwind_version'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom' && isset($responses['css_framework']) && $responses['css_framework'] === 'tailwind',
+                    fn () => \Laravel\Prompts\multiselect(
+                        label: 'Tailwind UI Component Libraries (Select all that apply)',
+                        options: ['flowbite' => 'Flowbite UI', 'shadcn' => 'Shadcn UI', 'daisyui' => 'DaisyUI'],
+                        default: []
+                    ),
+                    name: 'ui_libraries'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\multiselect(
+                        label: 'Backend & Infrastructure Packages (Select all that apply)',
+                        options: [
+                            'breeze' => 'Laravel Breeze (Auth UI Scaffolding)',
+                            'fortify' => 'Laravel Fortify (Headless Auth)',
+                            'socialite' => 'Laravel Socialite (Google & GitHub OAuth)',
+                            'spatie-permission' => 'Spatie Permission (Roles & Permissions)',
+                            'spatie-medialibrary' => 'Spatie MediaLibrary (File Management)',
+                            'reverb' => 'Laravel Reverb (Realtime WebSockets)',
+                            'telescope' => 'Laravel Telescope (Dev Debug Assistant)',
+                            'debugbar' => 'Barryvdh Debugbar (Execution Profiler)',
+                            'horizon' => 'Laravel Horizon (Redis Queue Monitor)',
+                            'modular-architecture' => 'Modular Domain Folders (Services, Actions, DTOs)',
+                        ],
+                        default: ['modular-architecture']
+                    ),
+                    name: 'packages'
+                )
+                ->addIf(
+                    fn ($responses) => $responses['mode'] === 'custom',
+                    fn () => \Laravel\Prompts\multiselect(
+                        label: 'Development & Workflow Tools (Select all that apply)',
+                        options: [
+                            'database-migrate' => 'Auto-create SQLite database & run migrations',
+                            'git' => 'Initialize local Git repository & initial commit',
+                            'ci-cd' => 'Generate GitHub Actions CI/CD Pipeline (Pest, PHPStan, Pint)',
+                        ],
+                        default: ['database-migrate', 'git', 'ci-cd']
+                    ),
+                    name: 'infrastructure'
+                )
+                ->submit();
 
-            if ($mode === 'preset') {
-                $presetOptions = [];
-                foreach ($blueprint->allPresets() as $key => $presetData) {
-                    $presetOptions[$key] = $presetData['name'];
-                }
-
-                $selectedPresetKey = select(
-                    label: 'Select a Preset',
-                    options: $presetOptions,
-                );
-
-                $preset = $blueprint->preset($selectedPresetKey);
+            if ($responses['mode'] === 'preset') {
+                $preset = $blueprint->preset($responses['preset_key']);
+                $runtime->setOption('laravel', 'version', $this->option('laravel-version') ?? 'latest');
+                $runtime->setOption('tailwind', 'version', $this->option('tailwind-version') ?? 'v4');
                 $runtime->enableMany($preset['technologies']);
             } else {
-                $laravelVersion = $this->option('laravel-version') ?? select(
-                    label: 'Select Laravel Framework Version',
-                    options: [
-                        'latest' => 'Laravel Latest (v13+)',
-                        '12' => 'Laravel 12',
-                        '11' => 'Laravel 11',
-                    ],
-                    default: 'latest'
-                );
-                $runtime->setOption('laravel', 'version', $laravelVersion);
-
-                $rendering = select(
-                    label: 'Server Rendering Engine',
-                    options: [
-                        'blade' => 'Blade Templating Engine',
-                        'inertia' => 'Inertia.js Monolith Adapter',
-                    ],
-                    default: 'blade'
-                );
-                $runtime->enable($rendering);
-
-                $reactivity = multiselect(
-                    label: 'Reactivity Layers (Select all that apply)',
-                    options: [
-                        'livewire' => 'Laravel Livewire (Server Reactivity)',
-                        'alpine' => 'Alpine.js (Client State & Interactivity)',
-                        'htmx' => 'HTMX (HTML-driven AJAX)',
-                    ],
-                    default: ['livewire', 'alpine']
-                );
-                $runtime->enableMany($reactivity);
-
-                $jsFrameworks = multiselect(
-                    label: 'JavaScript Component Libraries (Optional)',
-                    options: [
-                        'react' => 'React',
-                        'vue' => 'Vue.js',
-                    ],
-                    default: []
-                );
-                $runtime->enableMany($jsFrameworks);
-
-                $cssFramework = select(
-                    label: 'CSS Framework',
-                    options: [
-                        'tailwind' => 'Tailwind CSS',
-                        'bootstrap' => 'Bootstrap CSS',
-                    ],
-                    default: 'tailwind'
-                );
-                $runtime->enable($cssFramework);
-
-                if ($cssFramework === 'tailwind') {
-                    $tailwindVersion = $this->option('tailwind-version') ?? select(
-                        label: 'Select Tailwind CSS Version',
-                        options: [
-                            'v4' => 'Tailwind CSS v4 (@tailwindcss/vite)',
-                            'v3' => 'Tailwind CSS v3 (PostCSS + tailwind.config.js)',
-                        ],
-                        default: 'v4'
-                    );
-                    $runtime->setOption('tailwind', 'version', $tailwindVersion);
-
-                    $uiLibraries = multiselect(
-                        label: 'Tailwind UI Component Libraries (Select all that apply)',
-                        options: [
-                            'flowbite' => 'Flowbite UI',
-                            'shadcn' => 'Shadcn UI',
-                            'daisyui' => 'DaisyUI',
-                        ],
-                        default: []
-                    );
-                    $runtime->enableMany($uiLibraries);
+                $runtime->setOption('laravel', 'version', $this->option('laravel-version') ?? $responses['laravel_version']);
+                $runtime->enable($responses['rendering']);
+                $runtime->enableMany($responses['js_frameworks'] ?? []);
+                $runtime->enableMany($responses['reactivity'] ?? []);
+                $runtime->enable($responses['css_framework']);
+                
+                if ($responses['css_framework'] === 'tailwind') {
+                    $runtime->setOption('tailwind', 'version', $this->option('tailwind-version') ?? $responses['tailwind_version']);
+                    $runtime->enableMany($responses['ui_libraries'] ?? []);
                 }
 
-                $packages = multiselect(
-                    label: 'Backend & Infrastructure Packages (Select all that apply)',
-                    options: [
-                        'breeze' => 'Laravel Breeze (Auth UI Scaffolding)',
-                        'fortify' => 'Laravel Fortify (Headless Auth)',
-                        'socialite' => 'Laravel Socialite (Google & GitHub OAuth)',
-                        'spatie-permission' => 'Spatie Permission (Roles & Permissions)',
-                        'spatie-medialibrary' => 'Spatie MediaLibrary (File Management)',
-                        'reverb' => 'Laravel Reverb (Realtime WebSockets)',
-                        'telescope' => 'Laravel Telescope (Dev Debug Assistant)',
-                        'debugbar' => 'Barryvdh Debugbar (Execution Profiler)',
-                        'horizon' => 'Laravel Horizon (Redis Queue Monitor)',
-                        'modular-architecture' => 'Modular Domain Folders (Services, Actions, DTOs)',
-                    ],
-                    default: ['modular-architecture']
-                );
-                $runtime->enableMany($packages);
-
-                $infrastructure = multiselect(
-                    label: 'Development & Workflow Tools (Select all that apply)',
-                    options: [
-                        'database-migrate' => 'Auto-create SQLite database & run migrations',
-                        'git' => 'Initialize local Git repository & initial commit',
-                        'ci-cd' => 'Generate GitHub Actions CI/CD Pipeline (Pest, PHPStan, Pint)',
-                    ],
-                    default: ['database-migrate', 'git', 'ci-cd']
-                );
-                $runtime->enableMany($infrastructure);
+                $runtime->enableMany($responses['packages'] ?? []);
+                $runtime->enableMany($responses['infrastructure'] ?? []);
             }
         }
 
@@ -276,9 +307,28 @@ ASCII);
             return 1;
         }
 
-        note("✨ Project [{$projectName}] successfully generated!");
+        note("Project [{$projectName}] successfully generated!");
         info("Location: {$runtime->projectPath()}");
-        info("Run: cd {$projectName} && php artisan serve");
+        
+        $nextSteps = [];
+        $nextSteps[] = ["cd {$projectName}", "Navigate to project directory"];
+        
+        if ($runtime->isEnabled('vite') || $runtime->isEnabled('reverb') || $runtime->isEnabled('horizon')) {
+            $nextSteps[] = ["npm run dev:all", "Starts server, vite, queue, and websockets"];
+        } else {
+            $nextSteps[] = ["php artisan serve", "Starts local server"];
+        }
+        table(['Next Step', 'Description'], $nextSteps);
+
+        $dashboards = [];
+        $dashboards[] = ["Local Server", "http://localhost:8000"];
+        if ($runtime->isEnabled('reverb')) $dashboards[] = ["Laravel Reverb", "php artisan reverb:start"];
+        if ($runtime->isEnabled('horizon')) $dashboards[] = ["Laravel Horizon", "http://localhost:8000/horizon"];
+        if ($runtime->isEnabled('telescope')) $dashboards[] = ["Laravel Telescope", "http://localhost:8000/telescope"];
+
+        if (count($dashboards) > 1) {
+            table(['Installed Services Dashboard', 'Command / URL'], $dashboards);
+        }
 
         return 0;
     }

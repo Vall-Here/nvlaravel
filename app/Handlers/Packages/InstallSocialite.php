@@ -12,6 +12,15 @@ final class InstallSocialite
     {
         $context->composer()->require(['laravel/socialite']);
 
+        if (!$context->files()->exists('config/services.php')) {
+            try {
+                $context->composer()->artisan(['config:publish', 'services']);
+            } catch (\Throwable) {
+                // If artisan config:publish isn't supported, create base file
+                $context->files()->put('config/services.php', "<?php\n\nreturn [\n];\n");
+            }
+        }
+
         $context->files()->modify('config/services.php', function (string $content) {
             if (!str_contains($content, "'google' =>")) {
                 $serviceStubs = <<<PHP

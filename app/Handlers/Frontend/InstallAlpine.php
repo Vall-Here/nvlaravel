@@ -10,15 +10,22 @@ final class InstallAlpine
 {
     public function handle(StarterContext $context): void
     {
+        if ($context->runtime()->isEnabled('livewire')) {
+            $context->log("Alpine.js is bundled and managed by Livewire 3.");
+            return;
+        }
+
         $context->npm()->install(['alpinejs']);
 
-        $context->files()->modify('resources/js/app.js', function (string $content) {
+        $jsFile = $context->files()->exists('resources/js/app.jsx') ? 'resources/js/app.jsx' : 'resources/js/app.js';
+
+        $context->files()->modify($jsFile, function (string $content) {
             if (!str_contains($content, 'Alpine')) {
                 return "import Alpine from 'alpinejs';\nwindow.Alpine = Alpine;\nAlpine.start();\n" . $content;
             }
             return $content;
         });
 
-        $context->log("Alpine.js installed and initialized in resources/js/app.js.");
+        $context->log("Alpine.js installed and initialized in {$jsFile}.");
     }
 }

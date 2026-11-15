@@ -32,24 +32,38 @@ final class Resolver
         }
 
         $resolved = [];
-        $visited = [];
 
         foreach ($requested as $id) {
-            $this->resolveItem($id, $resolved, $visited, []);
+            $this->resolveItem($id, $resolved, []);
         }
 
         $this->validateConflicts($resolved);
 
-        // Ensure database-migrate is always the very last step if enabled
-        if (($key = array_search('database-migrate', $resolved, true)) !== false) {
-            unset($resolved[$key]);
-            $resolved[] = 'database-migrate';
+        // Inertia requires a client-side framework (default to Vue if neither React nor Vue is selected)
+        if (in_array('inertia', $resolved, true) && !in_array('react', $resolved, true) && !in_array('vue', $resolved, true)) {
+            $this->resolveItem('vue', $resolved, []);
         }
+
+        // Stably sort resolved technologies into safe architectural execution layers
+        usort($resolved, fn (string $a, string $b) => $this->layerRank($a) <=> $this->layerRank($b));
 
         return array_values($resolved);
     }
 
-    private function resolveItem(string $id, array &$resolved, array &$visited, array $path): void
+    private function layerRank(string $id): int
+    {
+        return match ($id) {
+            'laravel' => 1,
+            'blade', 'inertia', 'react', 'vue', 'tailwind', 'bootstrap', 'vite', 'livewire' => 2,
+            'breeze', 'fortify' => 3,
+            'flowbite', 'daisyui', 'shadcn', 'alpine', 'htmx' => 4,
+            'database-migrate' => 6,
+            'git' => 7,
+            default => 5,
+        };
+    }
+
+    private function resolveItem(string $id, array &$resolved, array $path): void
     {
         if (in_array($id, $resolved, true)) {
             return;
@@ -60,12 +74,11 @@ final class Resolver
             throw new RuntimeException("Circular dependency detected: {$cycle}");
         }
 
-        $visited[$id] = true;
         $path[] = $id;
 
         $requires = $this->blueprint->requires($id);
         foreach ($requires as $req) {
-            $this->resolveItem($req, $resolved, $visited, $path);
+            $this->resolveItem($req, $resolved, $path);
         }
 
         if (!in_array($id, $resolved, true)) {

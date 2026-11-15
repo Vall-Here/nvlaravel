@@ -21,11 +21,11 @@ final class InstallSpatiePermission
                     $content
                 );
                 
-                $content = preg_replace(
-                    '/use HasApiTokens, HasFactory, Notifiable;/',
-                    'use HasApiTokens, HasFactory, Notifiable, HasRoles;',
-                    $content
-                );
+                if (preg_match('/use\s+([^;]*HasFactory[^;]*);/', $content, $matches)) {
+                    $content = str_replace($matches[0], rtrim($matches[0], ';') . ', HasRoles;', $content);
+                } else {
+                    $content = preg_replace('/(class\s+User\s+extends\s+Authenticatable[^{]*\{)/', "$1\n    use HasRoles;\n", $content);
+                }
             }
             return $content;
         });

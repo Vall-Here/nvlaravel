@@ -54,14 +54,14 @@ return [
             'type' => 'javascript',
             'handler' => \App\Handlers\Frontend\InstallReact::class,
             'requires' => ['vite'],
-            'conflicts' => [],
+            'conflicts' => ['vue'],
         ],
         'vue' => [
             'name' => 'Vue.js Framework',
             'type' => 'javascript',
             'handler' => \App\Handlers\Frontend\InstallVue::class,
             'requires' => ['vite'],
-            'conflicts' => [],
+            'conflicts' => ['react'],
         ],
         'tailwind' => [
             'name' => 'Tailwind CSS',

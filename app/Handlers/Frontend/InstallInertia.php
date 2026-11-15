@@ -21,12 +21,20 @@ final class InstallInertia
 
         // Register middleware in bootstrap/app.php
         $context->files()->modify('bootstrap/app.php', function (string $content) {
-            $middlewareStub = "->withMiddleware(function (Middleware \$middleware) {\n        \$middleware->web(append: [\n            \App\Http\Middleware\HandleInertiaRequests::class,\n        ]);";
-            return str_replace(
-                '->withMiddleware(function (Middleware $middleware) {',
-                $middlewareStub,
-                $content
-            );
+            if (str_contains($content, 'HandleInertiaRequests::class')) {
+                return $content;
+            }
+
+            if (str_contains($content, '->withMiddleware(function (Middleware $middleware) {')) {
+                return preg_replace(
+                    '/->withMiddleware\(function\s*\(Middleware\s*\$middleware\)\s*\{(\s*\/\/\s*)?/',
+                    "->withMiddleware(function (Middleware \$middleware) {\n        \$middleware->web(append: [\n            \App\Http\Middleware\HandleInertiaRequests::class,\n        ]);\n",
+                    $content,
+                    1
+                );
+            }
+
+            return $content;
         });
 
         // Create app.blade.php root layout
@@ -57,6 +65,14 @@ final class InstallInertia
 BLADE;
         
         $context->files()->put('resources/views/app.blade.php', $appBlade);
+
+        // Point root route to Inertia Welcome component
+        $context->files()->modify('routes/web.php', function (string $content) {
+            if (!str_contains($content, 'Inertia::render')) {
+                return preg_replace('/return view\([\'"]welcome[\'"]\);/', "return \\Inertia\\Inertia::render('Welcome');", $content);
+            }
+            return $content;
+        });
 
         $context->log("Inertia.js server-side adapter installed and configured.");
     }

@@ -21,7 +21,6 @@ final class InstallVue
             $context->npm()->install(['@inertiajs/vue3']);
             $stub = <<<JS
 import './bootstrap';
-import '../css/app.css';
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -58,18 +57,22 @@ VUE);
         } else {
             $stub = <<<JS
 import './bootstrap';
-import { createApp } from 'vue';
-
-const app = createApp({
-    template: '<div>Vue initialized without Inertia.</div>'
-});
+import { createApp, h } from 'vue';
 
 const root = document.getElementById('app');
 if (root) {
-    app.mount('#app');
+    createApp({ render: () => h('div', 'Vue initialized without Inertia.') }).mount(root);
 }
 JS;
             $context->files()->put('resources/js/app.js', $stub);
+
+            // Update welcome.blade.php for standalone Vue + Blade
+            $context->files()->modify('resources/views/welcome.blade.php', function (string $content) {
+                if (!str_contains($content, 'id="app"')) {
+                    $content = preg_replace('/(<body[^>]*>)/', "$1\n        <div id=\"app\"></div>", $content);
+                }
+                return $content;
+            });
         }
 
         $context->log("Vue.js and Vite Vue plugin installed.");

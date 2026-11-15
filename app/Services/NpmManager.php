@@ -32,11 +32,6 @@ final class NpmManager
         $this->run($cmd);
     }
 
-    public function runBuild(): void
-    {
-        $this->run(['npm', 'run', 'build']);
-    }
-
     public function run(array $command, ?string $cwd = null): void
     {
         if ($cwd === null) {

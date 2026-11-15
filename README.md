@@ -336,13 +336,24 @@ Available presets:
 
 ## Technical Architecture
 
-The core engine follows a 4-layer execution pipeline:
+The core engine follows a deterministic 7-layer execution pipeline:
 
-1. **Blueprint (`App\Configuration\Blueprint`)**: Registry loading technology definitions, dependencies, and conflict matrices from `config/generator.php`.
-2. **RuntimeConfig (`App\Configuration\RuntimeConfig`)**: State container holding user selections.
-3. **Resolver (`App\Dependency\Resolver`)**: Dependency resolution using recursive topological sorting and circular dependency detection.
+1. **Layer 1 — Core Framework**: Initializes base Laravel application (`App\Handlers\Core\InstallLaravel`).
+2. **Layer 2 — Base Frontend**: Establishes asset bundling, view adapters, and stylesheets (`Vite`, `Blade`, `Inertia`, `React`, `Vue`, `Tailwind CSS`, `Bootstrap`, `Livewire`).
+3. **Layer 3 — Authentication**: Scaffolds authentication boilerplate without destroying base assets (`Breeze`, `Fortify`).
+4. **Layer 4 — UI & Interactivity**: Injects plugins into stable CSS/JS entry points (`Flowbite`, `DaisyUI`, `Shadcn UI`, `Alpine.js`, `HTMX`).
+5. **Layer 5 — Packages & Extensions**: Installs backend packages, realtime servers, and devtools (`Socialite`, `Spatie Permission`, `Spatie MediaLibrary`, `Telescope`, `Debugbar`, `Horizon`, `Reverb`, `Modular Architecture`, `CI/CD`).
+6. **Layer 6 — Database Migrations**: Initializes database connections and executes migrations with all package migrations published (`InstallDatabase`).
+7. **Layer 7 — Version Control & Atomicity**: Runs post-install optimizations (`PostInstallOptimizer`) and records the initial git commit (`InstallGit`).
+
+### Core Components
+
+1. **Blueprint (`App\Configuration\Blueprint`)**: Master registry loading technology definitions, dependencies, and conflict matrices from `config/generator.php`.
+2. **RuntimeConfig (`App\Configuration\RuntimeConfig`)**: State container holding user selections and options at runtime.
+3. **Resolver (`App\Dependency\Resolver`)**: Dependency resolution using topological sorting and tiered layer rank ordering.
 4. **ExecutionPlan (`App\Planning\ExecutionPlan`)**: Sequence generator ordering task handlers.
-5. **Executor (`App\Engine\Executor`)**: Handler pipeline running composer, npm, and stub transformations.
+5. **Executor (`App\Engine\Executor`)**: Handler pipeline running Composer, NPM, and surgical file transformations.
+6. **PostInstallOptimizer (`App\Services\PostInstallOptimizer`)**: Pre-commit optimizer generating concurrent dev runner scripts (`npm run dev:all`), documentation, and environment tuning.
 
 ### Safety Mechanisms
 
@@ -381,11 +392,11 @@ If you find a bug or have a feature request, please open an issue on the [GitHub
 
 Ensure your code follows the existing style and passes all tests by running `./vendor/bin/pest`.
 
-### ☕ Support
+### Support
 
 If you find this project useful, consider supporting my work:
 
-[![Saweria](https://img.shields.io/badge/☕%20Traktir%20Saya-Saweria-orange?style=for-the-badge)](https://saweria.co/valldev)
+[![Saweria](https://img.shields.io/badge/Traktir%20Saya-Saweria-orange?style=for-the-badge)](https://saweria.co/valldev)
 
 ## License
 

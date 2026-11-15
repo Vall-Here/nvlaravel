@@ -19,7 +19,7 @@ final class InstallHtmx
 
         $context->files()->modify($jsFile, function (string $content) {
             if (!str_contains($content, 'htmx')) {
-                return "import 'htmx.org';\n" . $content;
+                return "import htmx from 'htmx.org';\nwindow.htmx = htmx;\n" . $content;
             }
             return $content;
         });

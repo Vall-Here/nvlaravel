@@ -34,12 +34,6 @@ final class RuntimeConfig
         return $this;
     }
 
-    public function disable(string $id): self
-    {
-        unset($this->enabled[$id]);
-        return $this;
-    }
-
     public function isEnabled(string $id): bool
     {
         return $this->enabled[$id] ?? false;
@@ -67,17 +61,5 @@ final class RuntimeConfig
     public function enabledIds(): array
     {
         return array_keys(array_filter($this->enabled));
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'project' => [
-                'name' => $this->projectName,
-                'path' => $this->projectPath,
-            ],
-            'enabled' => $this->enabled,
-            'options' => $this->options,
-        ];
     }
 }

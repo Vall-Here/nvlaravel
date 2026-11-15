@@ -11,7 +11,7 @@ final class InstallSpatieMediaLibrary
     public function handle(StarterContext $context): void
     {
         $context->composer()->require(['spatie/laravel-medialibrary']);
-        $context->composer()->publish('Spatie\MediaLibrary\MediaLibraryServiceProvider', 'migrations');
+        $context->composer()->publish('Spatie\MediaLibrary\MediaLibraryServiceProvider', 'medialibrary-migrations');
         $context->log("Spatie MediaLibrary installed & migrations published.");
     }
 }
